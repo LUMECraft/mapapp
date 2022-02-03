@@ -1,20 +1,20 @@
-import assert from "assert";
+import assert from 'assert'
 
-describe("sk8earth-harp", function () {
-  it("package.json has correct name", async function () {
-    const { name } = await import("../package.json");
-    assert.strictEqual(name, "sk8earth-harp");
-  });
+describe('sk8earth-harp', function () {
+	it('package.json has correct name', async function () {
+		const {name} = await import('../package.json')
+		assert.strictEqual(name, 'sk8earth-harp')
+	})
 
-  if (Meteor.isClient) {
-    it("client is not server", function () {
-      assert.strictEqual(Meteor.isServer, false);
-    });
-  }
+	if (Meteor.isClient) {
+		it('client is not server', function () {
+			assert.strictEqual(Meteor.isServer, false)
+		})
+	}
 
-  if (Meteor.isServer) {
-    it("server is not client", function () {
-      assert.strictEqual(Meteor.isClient, false);
-    });
-  }
-});
+	if (Meteor.isServer) {
+		it('server is not client', function () {
+			assert.strictEqual(Meteor.isClient, false)
+		})
+	}
+})
