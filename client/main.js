@@ -10,13 +10,8 @@ import {MapControls, MapControlsUI} from '@here/harp-map-controls'
 
 import './main.html'
 
-Template.hello.onCreated(function helloOnCreated() {
-	// counter starts at 0
-	this.counter = new ReactiveVar(0)
-})
-
-Template.info.onRendered(() => {
-	// withoutWorker();
+Template.harp.onRendered(() => {
+	// withoutWorker()
 	withWorker()
 })
 
@@ -68,10 +63,10 @@ function withoutWorker() {
 function withWorker() {
 	// import OmvTileDecoderService inside a web Worker with vanilla JS, thanks to
 	// the JSPM ES Module CDN (https://jspm.io).
-	const workerCode = `
+	const workerCode = /*js*/ `
         async function main() {
             const { OmvTileDecoderService } = (
-                await import('https://dev.jspm.io/@here/harp-omv-datasource/index-worker')
+                await import('https://dev.jspm.io/@here/harp-omv-datasource@0.13.1/index-worker')
             ).default
 
             OmvTileDecoderService.start()
@@ -86,9 +81,8 @@ function withWorker() {
 	const mapView = new MapView({
 		canvas,
 
-		// theme:
-		//     "https://unpkg.com/@here/harp-map-theme@latest/resources/berlin_tilezen_night_reduced.json",
-		theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_base.json',
+		theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_night_reduced.json',
+		// theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_base.json',
 
 		decoderUrl: URL.createObjectURL(blob),
 
@@ -97,10 +91,7 @@ function withWorker() {
 		tileCacheSize: 100,
 	})
 
-	// map.setCameraGeolocationAndZoom(
-	//     new GeoCoordinates(1.278676, 103.850216),
-	//     16
-	// );
+	// mapView.setCameraGeolocationAndZoom(new GeoCoordinates(1.278676, 103.850216), 16)
 	mapView.camera.position.set(0, 0, 800)
 	mapView.geoCenter = new GeoCoordinates(40.70398928, -74.01319808, 0)
 	mapView.resize(canvas.clientWidth, canvas.clientHeight)
@@ -132,17 +123,3 @@ function withWorker() {
 
 	mapView.addDataSource(omvDataSource)
 }
-
-Template.hello.helpers({
-	counter() {
-		// @ts-ignore
-		return Template.instance().counter.get()
-	},
-})
-
-Template.hello.events({
-	'click button'(event, instance) {
-		// increment the counter when button is clicked
-		instance.counter.set(instance.counter.get() + 1)
-	},
-})
