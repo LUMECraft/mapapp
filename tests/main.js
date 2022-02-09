@@ -1,9 +1,9 @@
 import assert from 'assert'
 
-describe('sk8earth-harp', function () {
+describe('mapapp', function () {
 	it('package.json has correct name', async function () {
 		const {name} = await import('../package.json')
-		assert.strictEqual(name, 'sk8earth-harp')
+		assert.strictEqual(name, 'mapapp')
 	})
 
 	if (Meteor.isClient) {

@@ -1,0 +1,15 @@
+{
+	"presets": ["babel-preset-solid"],
+	"plugins": [
+		"solid-styled-jsx/babel",
+		[
+			"transform-imports",
+			{
+				"dayjs": {
+					"transform": "dayjs/${member}",
+					"preventFullImport": true
+				}
+			}
+		]
+	]
+}

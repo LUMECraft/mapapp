@@ -1,15 +1,5 @@
 <head>
-	<title>sk8earth-harp</title>
-</head>
-
-<body>
-	{{> harp}}
-</body>
-
-<template name="harp">
-	<div id="map">
-		<canvas id="harpCanvas"></canvas>
-	</div>
+	<title>mapapp</title>
 
 	<style>
 		body,
@@ -19,23 +9,9 @@
 			padding: 0;
 			margin: 0;
 		}
-
-		#map {
-			width: 100%;
-			height: 100%;
-			position: relative;
-		}
-
-		#map > * {
-			position: absolute;
-		}
-
-		#harpCanvas {
-			width: 100%;
-			height: 100%;
-			padding: 0;
-			border: 0;
-			display: block;
-		}
 	</style>
-</template>
+</head>
+
+<body>
+	<div id="main"></div>
+</body>
