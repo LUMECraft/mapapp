@@ -12,7 +12,6 @@ export function Messages() {
 		/** @type {any[]} */
 		messages: [],
 		newMessage: '',
-		submitting: 0,
 		stayAtBottom: true,
 		subReady: false,
 	})
@@ -180,10 +179,8 @@ export function Messages() {
 	function addMessage(event) {
 		event.preventDefault()
 
-		data.submitting++
 		Meteor.call('messages.insert', data.newMessage, error => {
 			if (error) alert(error.error)
-			data.submitting--
 		})
 		// clear the input field
 		data.newMessage = ''
