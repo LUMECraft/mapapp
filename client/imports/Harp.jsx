@@ -37,9 +37,9 @@ export function Harp() {
 		const mapView = new MapView({
 			canvas,
 
-			// theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_base.json',
-			// theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_night_reduced.json',
-			theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_effects_outlines.json',
+			// theme: '/harp-themes/berlin_tilezen_base.json',
+			// theme: '/harp-themes/berlin_tilezen_night_reduced.json',
+			theme: '/harp-themes/berlin_tilezen_effects_outlines.json',
 
 			...(useWorker
 				? {
