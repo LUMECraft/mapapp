@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Tracker} from 'meteor/tracker'
-import dayjs from '../../imports/day.js'
+import moment from 'moment'
 import {createEffect, createMemo, For, Show} from 'solid-js'
 import {createMutable} from 'solid-js/store'
 import {Messages as Msgs} from '../../imports/messages/messages.js'
@@ -9,6 +9,7 @@ export function Messages() {
 	let scroller
 
 	const data = createMutable({
+		/** @type {any[]} */
 		messages: [],
 		newMessage: '',
 		submitting: 0,
@@ -19,9 +20,13 @@ export function Messages() {
 	const sub = Meteor.subscribe('messages.all')
 
 	// Meteor's version of Solid createEffect.
-	Tracker.autorun(() => (data.subReady = sub.ready()))
+	Tracker.autorun(() => {
+		data.subReady = sub.ready()
+	})
 
-	Tracker.autorun(() => (data.messages = Msgs.find({})))
+	Tracker.autorun(() => {
+		data.messages = Msgs.find({}).fetch()
+	})
 
 	// Solid's version of Meteor Tracker.autorun.
 	createEffect(() => {
@@ -58,10 +63,10 @@ export function Messages() {
 
 		for (const msg of data.messages) {
 			const time = msg.time
-			const msgMoment = dayjs(time)
+			const msgMoment = moment(time)
 			if (!showWeekdayName && Date.now() - time < oneWeek) showWeekdayName = true
 
-			if (shouldShowTime === null || msgMoment.day() !== dayjs(lastShownTime).day()) showDay = true
+			if (shouldShowTime === null || msgMoment.day() !== moment(lastShownTime).day()) showDay = true
 			else showDay = false
 
 			// we should show time if the last message was more than
@@ -87,7 +92,7 @@ export function Messages() {
 			// and also insert the message
 			result.push({
 				...msg,
-				time: dayjs(time).format('MMMM, Do'),
+				time: moment(time).format('MMMM, Do'),
 			})
 		}
 
@@ -96,15 +101,15 @@ export function Messages() {
 
 	return (
 		<>
-			<div class="messages">
-				<div class="scrollerWrapper">
-					<div class="scroller" ref={scroller} onscroll={onScroll}>
+			<div className="messages">
+				<div className="scrollerWrapper">
+					<div className="scroller" ref={scroller} onscroll={onScroll}>
 						<Show when={data.subReady} fallback={<h3> Loading... </h3>}>
-							<div class="conversation">
+							<div className="conversation">
 								<For each={messagesFormatted()}>
 									{msg => (
-										<Show when={msg.shouldShowTime} fallback={<div class="message">{msg.value}</div>}>
-											<div class="time">
+										<Show when={msg.shouldShowTime} fallback={<div className="message">{msg.value}</div>}>
+											<div className="time">
 												<b>{msg.shouldShowTime}</b>
 											</div>
 										</Show>
@@ -115,45 +120,60 @@ export function Messages() {
 					</div>
 				</div>
 
-				<form class="info-link-add" onsubmit={addMessage}>
-					<input type="text" v-model="newMessage" placeholder="enter a message" required />
+				<form className="message-form" onsubmit={addMessage}>
+					<input
+						type="text"
+						use:model={[() => data.newMessage, v => (data.newMessage = v)]}
+						placeholder="enter a message"
+						required
+					/>
 					<input type="submit" value="Send message" />
 				</form>
-
-				<style jsx>{
-					/*css*/ `
-						.messages {
-							width: 100%;
-							height: 100%;
-							box-sizing: border-box;
-							overflow: hidden;
-							position: relative;
-						}
-						.messages .scrollerWrapper {
-							width: 100%;
-							height: 100%;
-							position: absolute;
-							/* move content upward so we don't block the input */
-							padding-top: 22px;
-							transform: translateY(-22px);
-						}
-						.messages .scrollerWrapper .scroller {
-							width: 100%;
-							height: 100%;
-							overflow-x: hidden;
-							overflow-y: auto;
-						}
-						.messages form {
-							bottom: 0px;
-							position: absolute;
-						}
-						.messages li {
-							margin: 10px 0;
-							list-style: none;
-						}
-					`
-				}</style>
 			</div>
+
+			<style jsx>{
+				/*css*/ `
+					.messages {
+						box-sizing: border-box;
+						position: absolute;
+						width: 300px;
+						height: calc(100vh - 20px);
+						top: 10px;
+						right: 10px;
+						padding: 10px;
+
+						/* overflow: hidden; */
+						background: rgba(0, 0, 0, 0.6);
+						color: white;
+
+						display: flex;
+						flex-direction: column;
+					}
+
+					.messages .scrollerWrapper {
+						flex-grow: 1;
+
+						/*
+						CSS is full of dumb tricks, like this one to make a
+						flex-grow container not exceed the maximum size
+						available in the layout. What the hell were CSS spec
+						authors thinking?
+						*/
+						min-height: 0;
+
+						margin-bottom: 10px;
+					}
+					.messages .scrollerWrapper .scroller {
+						width: 100%;
+						height: 100%;
+						overflow-x: hidden;
+						overflow-y: auto;
+					}
+
+					.messages form {
+					}
+				`
+			}</style>
 		</>
 	)
 
@@ -172,10 +192,20 @@ export function Messages() {
 	function onScroll() {
 		// This prevents the view from jumping back to the bottom if
 		// the user scrolled up to read older content.
-		if (data.stayAtBottom && scroller.scrollTop < scroller.scrollHeight - scroller.clientHeight) {
+		// NOTE: scrollTop is fractional, while scrollHeight and clientHeight
+		// are not, so without Math.round() sometimes stayAtBottom won't work
+		// because scrollTop will not be >= scrollHeight-clientHeight, but
+		// slightly smaller from not being round up, for example.
+		if (data.stayAtBottom && Math.round(scroller.scrollTop) < scroller.scrollHeight - scroller.clientHeight) {
 			data.stayAtBottom = false
-		} else if (!data.stayAtBottom && scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight) {
+		} else if (!data.stayAtBottom && Math.round(scroller.scrollTop) === scroller.scrollHeight - scroller.clientHeight) {
 			data.stayAtBottom = true
 		}
 	}
+}
+
+export function model(input, accessor) {
+	const [getValue, setValue] = accessor()
+	input.addEventListener('input', () => setValue(input.value))
+	createEffect(() => (input.value = getValue()))
 }

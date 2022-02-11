@@ -1,5 +1,5 @@
 // @ts-check
-import {onMount} from 'solid-js'
+import {createEffect, createSignal, onCleanup, onMount} from 'solid-js'
 import {MapView} from '@here/harp-mapview'
 import {GeoCoordinates, sphereProjection} from '@here/harp-geoutils'
 import {APIFormat, AuthenticationMethod, OmvDataSource} from '@here/harp-omv-datasource'
@@ -11,9 +11,13 @@ import {harp} from '../../imports/keys.js'
 export function Harp() {
 	/** @type {HTMLCanvasElement} */
 	let canvas
+	/** @type {HTMLDivElement} */
+	let map
+
+	const [size, setSize] = createSignal()
 
 	onMount(() => {
-		const useWOrker = true
+		const useWorker = true
 
 		// import OmvTileDecoderService inside a web Worker with vanilla JS, thanks to
 		// the JSPM ES Module CDN (https://jspm.io).
@@ -33,10 +37,11 @@ export function Harp() {
 		const mapView = new MapView({
 			canvas,
 
+			// theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_base.json',
 			// theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_night_reduced.json',
-			theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_base.json',
+			theme: 'https://unpkg.com/@here/harp-map-theme@0.13.0/resources/berlin_tilezen_effects_outlines.json',
 
-			...(useWOrker
+			...(useWorker
 				? {
 						decoderUrl: URL.createObjectURL(blob),
 				  }
@@ -66,7 +71,11 @@ export function Harp() {
 		// }) TODO use new API
 
 		mapView.resize(canvas.clientWidth, canvas.clientHeight)
-		window.onresize = () => mapView.resize(canvas.clientWidth, canvas.clientHeight)
+
+		createEffect(() => {
+			if (!size()) return
+			mapView.resize(size().target.clientWidth, size().target.clientHeight)
+		})
 
 		let defaultControls = false
 
@@ -80,7 +89,7 @@ export function Harp() {
 			})
 
 			// TODO move into the component.
-			document.querySelector('#map').appendChild(ui.domElement)
+			map.appendChild(ui.domElement)
 
 			// mapControls.maxPitchAngle = 90;
 			// mapControls.setRotation(6.3, 50);
@@ -99,7 +108,7 @@ export function Harp() {
 			apiFormat: APIFormat.XYZOMV,
 			styleSetName: 'tilezen',
 
-			...(useWOrker
+			...(useWorker
 				? {}
 				: {
 						// This here! Set this to disable workers and make it load in the same thread (I
@@ -113,35 +122,38 @@ export function Harp() {
 
 	return (
 		<>
-			<canvas id="harpCanvas" ref={canvas}></canvas>
+			<div ref={map} use:onresize={setSize}>
+				<canvas ref={canvas}></canvas>
+			</div>
 
 			<style jsx>{
 				/*css*/ `
-					#map {
+					div {
 						width: 100%;
-						height: 50%;
+						height: 100%;
 						position: relative;
 					}
 
-					#map > * {
+					div > * {
 						position: absolute;
 					}
 
-					#harpCanvas {
+					canvas {
 						width: 100%;
 						height: 100%;
 						padding: 0;
 						border: 0;
 						display: block;
 					}
-
-					#msgs {
-						width: 100%;
-						height: 50%;
-						position: relative;
-					}
 				`
 			}</style>
 		</>
 	)
+}
+
+function onresize(el, arg) {
+	const setSize = arg()
+	const observer = new ResizeObserver(records => setSize(records[records.length - 1]))
+	observer.observe(el)
+	onCleanup(() => observer.disconnect())
 }
