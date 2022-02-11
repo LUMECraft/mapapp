@@ -192,15 +192,8 @@ export function Messages() {
 	function onScroll() {
 		// This prevents the view from jumping back to the bottom if
 		// the user scrolled up to read older content.
-		// NOTE: scrollTop is fractional, while scrollHeight and clientHeight
-		// are not, so without Math.round() sometimes stayAtBottom won't work
-		// because scrollTop will not be >= scrollHeight-clientHeight, but
-		// slightly smaller from not being round up, for example.
-		if (data.stayAtBottom && Math.round(scroller.scrollTop) < scroller.scrollHeight - scroller.clientHeight) {
-			data.stayAtBottom = false
-		} else if (!data.stayAtBottom && Math.round(scroller.scrollTop) === scroller.scrollHeight - scroller.clientHeight) {
-			data.stayAtBottom = true
-		}
+		if (!data.stayAtBottom && isScrolledToBottom(scroller)) data.stayAtBottom = true
+		else if (data.stayAtBottom && !isScrolledToBottom(scroller)) data.stayAtBottom = false
 	}
 }
 
@@ -208,4 +201,12 @@ export function model(input, accessor) {
 	const [getValue, setValue] = accessor()
 	input.addEventListener('input', () => setValue(input.value))
 	createEffect(() => (input.value = getValue()))
+}
+
+function isScrolledToBottom(el) {
+	// NOTE: scrollTop is fractional, while scrollHeight and clientHeight are
+	// not, so without this Math.abs() trick then sometimes the result won't
+	// work because scrollTop may not be exactly equal to el.scrollHeight -
+	// el.clientHeight when scrolled to the bottom.
+	return Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 1
 }
