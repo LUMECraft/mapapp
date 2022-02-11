@@ -61,14 +61,9 @@ export function Harp() {
 			projection: sphereProjection,
 		})
 
-		// These two are roughly the same, one uses meter distance, one uses zoom level.
+		// These two APIs are roughly the same, one uses meter distance, one uses zoom level.
+		mapView.lookAt(new GeoCoordinates(40.70398928, -74.01319808), 2_000_000)
 		// mapView.setCameraGeolocationAndZoom(new GeoCoordinates(40.70398928, -74.01319808), 14)
-		mapView.lookAt(new GeoCoordinates(40.70398928, -74.01319808), 11500)
-
-		// mapView.lookAt({
-		// 	target: new GeoCoordinates(40.70398928, -74.01319808),
-		// 	zoomLevel: 16,
-		// }) TODO use new API
 
 		mapView.resize(canvas.clientWidth, canvas.clientHeight)
 
@@ -88,12 +83,7 @@ export function Harp() {
 				projectionSwitch: true,
 			})
 
-			// TODO move into the component.
 			map.appendChild(ui.domElement)
-
-			// mapControls.maxPitchAngle = 90;
-			// mapControls.setRotation(6.3, 50);
-			// mapControls.camera.rotation
 		}
 
 		const omvDataSource = new OmvDataSource({
