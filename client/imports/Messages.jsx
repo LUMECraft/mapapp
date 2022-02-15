@@ -4,6 +4,7 @@ import moment from 'moment'
 import {createEffect, createMemo, For, Show} from 'solid-js'
 import {createMutable} from 'solid-js/store'
 import {Messages as Msgs} from '../../imports/messages/messages.js'
+import {user} from '../user.js'
 
 export function Messages() {
 	let scroller
@@ -107,7 +108,15 @@ export function Messages() {
 							<div className="conversation">
 								<For each={messagesFormatted()}>
 									{msg => (
-										<Show when={msg.shouldShowTime} fallback={<div className="message">{msg.value}</div>}>
+										<Show
+											when={msg.shouldShowTime}
+											fallback={
+												<div className="message">
+													<span style="font-weight: bold;">{msg.user.split('@')[0]}:&nbsp;</span>
+													<span>{msg.value}</span>
+												</div>
+											}
+										>
 											<div className="time">
 												<b>{msg.shouldShowTime}</b>
 											</div>
@@ -119,15 +128,17 @@ export function Messages() {
 					</div>
 				</div>
 
-				<form className="message-form" onsubmit={addMessage}>
-					<input
-						type="text"
-						use:model={[() => data.newMessage, v => (data.newMessage = v)]}
-						placeholder="enter a message"
-						required
-					/>
-					<input type="submit" value="Send message" />
-				</form>
+				<Show when={user()} fallback={<input placeholder="Sign in to comment." disabled />}>
+					<form className="message-form" onsubmit={addMessage}>
+						<input
+							type="text"
+							use:model={[() => data.newMessage, v => (data.newMessage = v)]}
+							placeholder="enter a message"
+							required
+						/>
+						<input type="submit" value="Send message" />
+					</form>
+				</Show>
 			</div>
 
 			<style jsx>{
@@ -143,6 +154,7 @@ export function Messages() {
 
 						/* overflow: hidden; */
 						background: rgba(0, 0, 0, 0.6);
+						border-radius: 4px;
 						color: white;
 
 						display: flex;

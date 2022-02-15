@@ -5,7 +5,7 @@
     "module": "esNext",
     "lib": ["esnext", "dom"],
     "allowJs": true,
-    "checkJs": false,
+    "checkJs": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "incremental": true,
