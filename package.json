@@ -2,7 +2,8 @@
 	"name": "mapapp",
 	"private": true,
 	"scripts": {
-		"start": "meteor run",
+		"start": "npm run meteor",
+		"meteor": "meteor --exclude-archs \"web.browser.legacy, web.cordova\"",
 		"test": "meteor test --once --driver-package meteortesting:mocha",
 		"test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
 		"visualize": "meteor --production --extra-packages bundle-visualizer"
@@ -21,10 +22,10 @@
 	},
 	"meteor": {
 		"mainModule": {
-			"client": "client/main.js",
-			"server": "server/main.js"
+			"client": "client/main.tsx",
+			"server": "server/main.ts"
 		},
-		"testModule": "tests/main.js"
+		"testModule": "tests/main.ts"
 	},
 	"devDependencies": {
 		"@types/meteor": "^2.0.4",

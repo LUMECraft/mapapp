@@ -6,7 +6,7 @@ import {APIFormat, AuthenticationMethod, OmvDataSource} from '@here/harp-omv-dat
 import {OmvTileDecoder} from '@here/harp-omv-datasource/index-worker'
 import {MapControls, MapControlsUI} from '@here/harp-map-controls'
 
-import {harp} from '../../imports/keys.js'
+import {harp} from '../../imports/keys'
 
 export function Harp() {
 	/** @type {HTMLCanvasElement} */

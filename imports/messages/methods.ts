@@ -2,7 +2,7 @@
 
 import {Meteor} from 'meteor/meteor'
 import {check} from 'meteor/check'
-import {Messages} from './messages.js'
+import {Messages} from './messages'
 
 Meteor.methods({
 	'messages.insert'(value) {

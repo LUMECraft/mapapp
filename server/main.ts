@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
-import {createFixtures} from './imports/fixtures.js'
-import './imports/register-api.js'
+import {createFixtures} from './imports/fixtures'
+import './imports/register-api'
 
 main()
 

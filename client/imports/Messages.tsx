@@ -3,8 +3,8 @@ import {Tracker} from 'meteor/tracker'
 import moment from 'moment'
 import {createEffect, createMemo, For, Show} from 'solid-js'
 import {createMutable} from 'solid-js/store'
-import {Messages as Msgs} from '../../imports/messages/messages.js'
-import {user} from '../user.js'
+import {Messages as Msgs} from '../../imports/messages/messages'
+import {user} from '../user'
 
 export function Messages() {
 	let scroller

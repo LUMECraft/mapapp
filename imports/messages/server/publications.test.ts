@@ -3,9 +3,9 @@
 // https://guide.meteor.com/testing.html
 
 import {assert} from 'meteor/practicalmeteor:chai'
-import {Messages} from '../messages.js'
+import {Messages} from '../messages'
 import {PublicationCollector} from 'meteor/johanbrook:publication-collector'
-import './publications.js'
+import './publications'
 
 describe('messages publications', function () {
 	beforeEach(function () {

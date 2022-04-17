@@ -1,7 +1,7 @@
 import {render} from 'solid-js/web'
-import {BlazeComponent} from './imports/BlazeComponent.jsx'
-import {Harp} from './imports/Harp.jsx'
-import {Messages} from './imports/Messages.jsx'
+import {BlazeComponent} from './imports/BlazeComponent'
+import {Harp} from './imports/Harp'
+import {Messages} from './imports/Messages'
 
 // This typedef merely imports solid-styled-jsx so that the attribute types for
 // <style> elements are available.

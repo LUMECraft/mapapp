@@ -4,7 +4,7 @@
 
 import {Meteor} from 'meteor/meteor'
 import {assert} from 'meteor/practicalmeteor:chai'
-import {Messages} from './messages.js'
+import {Messages} from './messages'
 
 if (Meteor.isServer) {
 	describe('messages collection', function () {
