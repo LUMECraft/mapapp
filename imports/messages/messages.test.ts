@@ -10,6 +10,7 @@ if (Meteor.isServer) {
 	describe('messages collection', function () {
 		it('insert correctly', function () {
 			const id = Messages.insert({
+				user: 'foo@bar.baz',
 				value: "Hey, what's up?",
 				time: Date.now(),
 			})

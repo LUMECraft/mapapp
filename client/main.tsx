@@ -3,9 +3,9 @@ import {BlazeComponent} from './imports/BlazeComponent'
 import {Harp} from './imports/Harp'
 import {Messages} from './imports/Messages'
 
-// This typedef merely imports solid-styled-jsx so that the attribute types for
+// Type import of solid-styled-jsx so that the attribute types for
 // <style> elements are available.
-/** @typedef {import ('solid-styled-jsx')} _ */
+import type {} from 'solid-styled-jsx'
 
 function Main() {
 	return (
@@ -48,4 +48,4 @@ function Main() {
 	)
 }
 
-render(Main, document.querySelector('#main'))
+render(Main, document.querySelector('#main')!)

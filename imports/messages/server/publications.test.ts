@@ -11,6 +11,7 @@ describe('messages publications', function () {
 	beforeEach(function () {
 		Messages.remove({})
 		Messages.insert({
+			user: 'foo@bar.baz',
 			value: "Hey, what's up?",
 			time: Date.now(),
 		})

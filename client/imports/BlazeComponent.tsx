@@ -3,14 +3,16 @@ import {Template} from 'meteor/templating'
 import {Blaze} from 'meteor/blaze'
 import {createEffect, onCleanup, onMount} from 'solid-js'
 
-/** A Solid component for loading Meteor Blaze components.
- * @param {{name: string; data?: object, onRendered: (container: HTMLDivElement) => void}} props
- */
-export function BlazeComponent(props) {
-	/** @type {HTMLDivElement} */
-	let container
-	/** @type {any} */
-	let blazeView
+interface BlazeComponentProps {
+	name: string
+	data?: object
+	onRendered: (container: HTMLDivElement) => void
+}
+
+/** A Solid component for loading Meteor Blaze components. */
+export function BlazeComponent(props: BlazeComponentProps) {
+	let container!: HTMLDivElement
+	let blazeView!: Blaze.View
 
 	const reactiveData = new ReactiveVar(props.data ?? {})
 

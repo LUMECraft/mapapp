@@ -1,17 +1,16 @@
 import {Meteor} from 'meteor/meteor'
 import {Tracker} from 'meteor/tracker'
 import moment from 'moment'
-import {createEffect, createMemo, For, Show} from 'solid-js'
+import {Accessor, createEffect, createMemo, For, Show} from 'solid-js'
 import {createMutable} from 'solid-js/store'
-import {Messages as Msgs} from '../../imports/messages/messages'
+import {Message, Messages as Msgs} from '../../imports/messages/messages'
 import {user} from '../user'
 
 export function Messages() {
-	let scroller
+	let scroller!: HTMLDivElement
 
 	const data = createMutable({
-		/** @type {any[]} */
-		messages: [],
+		messages: [] as Message[],
 		newMessage: '',
 		stayAtBottom: true,
 		subReady: false,
@@ -43,7 +42,7 @@ export function Messages() {
 	})
 
 	const messagesFormatted = createMemo(() => {
-		const result = []
+		const result: (Time | FormattedMessage)[] = []
 
 		if (!data.messages.length) return result
 
@@ -109,16 +108,16 @@ export function Messages() {
 								<For each={messagesFormatted()}>
 									{msg => (
 										<Show
-											when={msg.shouldShowTime}
+											when={'shouldShowTime' in msg && msg.shouldShowTime}
 											fallback={
 												<div className="message">
-													<span style="font-weight: bold;">{msg.user.split('@')[0]}:&nbsp;</span>
-													<span>{msg.value}</span>
+													<span style="font-weight: bold;">{(msg as FormattedMessage).user.split('@')[0]}:&nbsp;</span>
+													<span>{(msg as FormattedMessage).value}</span>
 												</div>
 											}
 										>
 											<div className="time">
-												<b>{msg.shouldShowTime}</b>
+												<b>{(msg as Time).shouldShowTime}</b>
 											</div>
 										</Show>
 									)}
@@ -188,10 +187,10 @@ export function Messages() {
 		</>
 	)
 
-	function addMessage(event) {
+	function addMessage(event: SubmitEvent) {
 		event.preventDefault()
 
-		Meteor.call('messages.insert', data.newMessage, error => {
+		Meteor.call('messages.insert', data.newMessage, (error: any) => {
 			if (error) alert(error.error)
 		})
 		// clear the input field
@@ -206,16 +205,37 @@ export function Messages() {
 	}
 }
 
-export function model(input, accessor) {
+// type ModelDirectiveArg = [Accessor<string>, Setter<string>] // breaks
+type ModelDirectiveArg = [Accessor<string>, (s: string) => void] // works
+
+export function model(input: HTMLInputElement, accessor: Accessor<ModelDirectiveArg>) {
 	const [getValue, setValue] = accessor()
 	input.addEventListener('input', () => setValue(input.value))
 	createEffect(() => (input.value = getValue()))
 }
 
-function isScrolledToBottom(el) {
+function isScrolledToBottom(el: HTMLElement) {
 	// NOTE: scrollTop is fractional, while scrollHeight and clientHeight are
 	// not, so without this Math.abs() trick then sometimes the result won't
 	// work because scrollTop may not be exactly equal to el.scrollHeight -
 	// el.clientHeight when scrolled to the bottom.
 	return Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 1
+}
+
+interface FormattedMessage {
+	time: string
+	user: string
+	value: string
+}
+
+interface Time {
+	shouldShowTime: string
+}
+
+declare module 'solid-js' {
+	namespace JSX {
+		interface Directives {
+			model: ModelDirectiveArg
+		}
+	}
 }

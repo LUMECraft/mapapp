@@ -26,5 +26,5 @@
 		"esModuleInterop": true,
 		"preserveSymlinks": true
 	},
-	"include": ["./src/**"]
+	"include": ["./client/**/*", "./imports/**/*", "./server/**/*", "./tests/**/*"]
 }

@@ -1,5 +1,5 @@
 // @ts-check
-import {createEffect, createSignal, onCleanup, onMount} from 'solid-js'
+import {Accessor, createEffect, createSignal, onCleanup, onMount} from 'solid-js'
 import {MapView} from '@here/harp-mapview'
 import {GeoCoordinates, sphereProjection} from '@here/harp-geoutils'
 import {APIFormat, AuthenticationMethod, OmvDataSource} from '@here/harp-omv-datasource'
@@ -9,12 +9,10 @@ import {MapControls, MapControlsUI} from '@here/harp-map-controls'
 import {harp} from '../../imports/keys'
 
 export function Harp() {
-	/** @type {HTMLCanvasElement} */
-	let canvas
-	/** @type {HTMLDivElement} */
-	let map
+	let canvas!: HTMLCanvasElement
+	let map!: HTMLDivElement
 
-	const [size, setSize] = createSignal()
+	const [mapSize, setMapSize] = createSignal<ResizeObserverEntry>()
 
 	onMount(() => {
 		const useWorker = true
@@ -68,8 +66,9 @@ export function Harp() {
 		mapView.resize(canvas.clientWidth, canvas.clientHeight)
 
 		createEffect(() => {
-			if (!size()) return
-			mapView.resize(size().target.clientWidth, size().target.clientHeight)
+			const size = mapSize()
+			if (!size) return
+			mapView.resize(size.target.clientWidth, size.target.clientHeight)
 		})
 
 		let defaultControls = false
@@ -112,7 +111,7 @@ export function Harp() {
 
 	return (
 		<>
-			<div ref={map} use:onresize={setSize}>
+			<div ref={map} use:onresize={setMapSize}>
 				<canvas ref={canvas}></canvas>
 			</div>
 
@@ -141,9 +140,19 @@ export function Harp() {
 	)
 }
 
-function onresize(el, arg) {
+type ResizeDirectiveArg = (size: ResizeObserverEntry) => void
+
+function onresize(el: HTMLElement, arg: Accessor<ResizeDirectiveArg>) {
 	const setSize = arg()
 	const observer = new ResizeObserver(records => setSize(records[records.length - 1]))
 	observer.observe(el)
 	onCleanup(() => observer.disconnect())
+}
+
+declare module 'solid-js' {
+	namespace JSX {
+		interface Directives {
+			onresize: ResizeDirectiveArg
+		}
+	}
 }
